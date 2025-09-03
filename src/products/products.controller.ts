@@ -1,48 +1,34 @@
-// src/products/products.controller.ts
-import { Controller, Get, Post, Put, Delete, Param, Body, NotFoundException } from '@nestjs/common';
-import { ProductsService } from './products.service'; // Importar o service
-import { CreateProductDto } from './Dto/create-product.dto'; // Importar DTO
+import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import { ProductsService } from './products.service';
+import { CreateProductDto } from './Dto/create-product.dto';
 import { UpdateProductDto } from './Dto/update-product.dto';
-
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @Post()
+  create(@Body() createProductDto: CreateProductDto) {
+    return this.productsService.create(createProductDto);
+  }
+
   @Get()
-  findAll(): any[] { // Retorna array de qualquer tipo por enquanto
+  findAll() {
     return this.productsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): any {
-    const product = this.productsService.findOne(parseInt(id, 10));
-    if (!product) {
-        throw new NotFoundException(`Produto com ID ${id} não encontrado.`);
-    }
-    return product;
-  }
-
-  @Post()
-  create(@Body() createProductDto: CreateProductDto): any { // Usar CreateProductDto
-    return this.productsService.create(createProductDto);
+  findOne(@Param('id') id: number) {
+    return this.productsService.findOne(+id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto): any { // Usar UpdateProductDto
-    const product = this.productsService.update(parseInt(id, 10), updateProductDto);
-    if (!product) {
-        throw new NotFoundException(`Produto com ID ${id} não encontrado para atualizar.`);
-    }
-    return product;
+  update(@Param('id') id: number, @Body() updateProductDto: UpdateProductDto) {
+    return this.productsService.update(+id, updateProductDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): any {
-    const removed = this.productsService.remove(parseInt(id, 10));
-    if (!removed) {
-        throw new NotFoundException(`Produto com ID ${id} não encontrado para remover.`);
-    }
-    return { message: `Produto com ID ${id} removido com sucesso.` };
+  remove(@Param('id') id: number) {
+    return this.productsService.remove(+id);
   }
 }
